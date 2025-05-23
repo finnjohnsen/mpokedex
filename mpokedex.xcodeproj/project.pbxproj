@@ -27,6 +27,7 @@
 		5647664B2DE0636A00DA0118 /* mpokedex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mpokedex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5647665A2DE0636B00DA0118 /* mpokedexTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = mpokedexTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		564766642DE0636B00DA0118 /* mpokedexUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = mpokedexUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		56607BD52DE0744800146199 /* mpokedex.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = mpokedex.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,11 +39,6 @@
 		5647665D2DE0636B00DA0118 /* mpokedexTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = mpokedexTests;
-			sourceTree = "<group>";
-		};
-		564766672DE0636B00DA0118 /* mpokedexUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = mpokedexUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -75,9 +71,9 @@
 		564766422DE0636A00DA0118 = {
 			isa = PBXGroup;
 			children = (
+				56607BD52DE0744800146199 /* mpokedex.xctestplan */,
 				5647664D2DE0636A00DA0118 /* mpokedex */,
 				5647665D2DE0636B00DA0118 /* mpokedexTests */,
-				564766672DE0636B00DA0118 /* mpokedexUITests */,
 				5647664C2DE0636A00DA0118 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,9 +148,6 @@
 			);
 			dependencies = (
 				564766662DE0636B00DA0118 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				564766672DE0636B00DA0118 /* mpokedexUITests */,
 			);
 			name = mpokedexUITests;
 			packageProductDependencies = (

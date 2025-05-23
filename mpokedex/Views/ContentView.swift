@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  mpokedex
-//
-//  Created by Finn J Johnsen on 23/05/2025.
-//
-
 import SwiftUI
 import SwiftData
 
