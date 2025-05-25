@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1630"
+   LastUpgradeVersion = "1640"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -19,9 +19,9 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "564766592DE0636B00DA0118"
-               BuildableName = "mpokedexTests.xctest"
-               BlueprintName = "mpokedexTests"
+               BlueprintIdentifier = "56DC8CCD2DE267300046BB55"
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests"
                ReferencedContainer = "container:mpokedex.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -54,15 +54,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5647664A2DE0636A00DA0118"
-            BuildableName = "mpokedex.app"
-            BlueprintName = "mpokedex"
-            ReferencedContainer = "container:mpokedex.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

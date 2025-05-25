@@ -1,66 +1,69 @@
 import SwiftUI
+import SwiftData
+import PokemonAPI
 
 struct RandomPokemonView: View {
-    @State private var numberOfPokemons: Int = 0
+    @Environment(\.modelContext) private var modelContext
+    @Query private var pokemonList : [Pokemon]
+    
     @State private var isLoading: Bool = true
     @State private var errorMessage: String?
+    @State private var randomInt: Int?
+    @State private var repo: PokemonDataLoaderService?
     
-    private let pokeService: PokeApi
-    
-    init(pokeService: PokeApi = PokeApiRestV2Service()) {
-        self.pokeService = pokeService
-    }
+    init() {}
     
     var body: some View {
         VStack(spacing: 20) {
-            if isLoading {
-                ProgressView()
-                Text("Fetching Pokémon data...")
-            } else if let error = errorMessage {
-                Text("Error: \(error)")
-                    .foregroundColor(.red)
-                Button("Retry") {
-                    fetchNumberOfPokemons()
-                }
-            } else {
-                Text("Total Pokémon: \(numberOfPokemons)")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
+            Text("Pokemons \(pokemonList.count)")
+            
+            Button("Reload data") {
+                loadData()
             }
+            
+            Button("Wipe data") {
+                do {
+                    try wipePokemon()
+                } catch {
+                    
+                }
+            }
+            
+            if (pokemonList.count > 0 && randomInt != nil) {
+                Text("Random Pokemon \(pokemonList[randomInt!].name)")
+                Button("Random") {
+                    randomInt = Int.random(in: 0..<pokemonList.count)
+                }
+            }
+            
         }
         .task {
-            fetchNumberOfPokemons()
+            repo = PokemonDataLoaderService(modelContext: modelContext)
+            loadData()
         }
     }
     
-    private func fetchNumberOfPokemons() {
-        isLoading = true
-        errorMessage = nil
-        
+    private func loadData()  {
         Task {
             do {
-                let count = try await pokeService.getNumberOfPokemons()
-                await MainActor.run {
-                    numberOfPokemons = count
-                    isLoading = false
+                guard let repo = repo else { return }
+                try await repo.loadPokemonIfNeeded()
+                if pokemonList.count > 0 {
+                    randomInt = Int.random(in: 0..<pokemonList.count)
                 }
             } catch {
-                await MainActor.run {
-                    errorMessage = error.localizedDescription
-                    isLoading = false
-                }
             }
+        }
+    }
+    
+    private func wipePokemon() throws{
+        Task {
+            guard let repo = repo else { return }
+            try repo.wipePokemon()
         }
     }
 }
 
-struct PokeApiPreview: PokeApi {
-    func getNumberOfPokemons() async throws -> Int {
-        return 1000
-    }
-}
-
-#Preview {
-    RandomPokemonView(pokeService: PokeApiPreview())
-}
+//#Preview("Success") {
+//    RandomPokemonView(pokeService: PokeApiPreview())
+//}

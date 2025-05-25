@@ -1,0 +1,15 @@
+{
+  "originHash" : "e523c10b530dad252968088fa950a1e7bf40ea747ec025e6b66365a1f0215fa4",
+  "pins" : [
+    {
+      "identity" : "pokemonapi",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kinkofer/PokemonAPI",
+      "state" : {
+        "revision" : "14018ba152222c1dfe8502202731776cc761705a",
+        "version" : "7.0.2"
+      }
+    }
+  ],
+  "version" : 3
+}
