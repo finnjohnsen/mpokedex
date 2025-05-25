@@ -1,29 +1,48 @@
 import SwiftUI
+import SwiftData
 
 struct ParentsView: View {
-    private enum LoadingState { case initializing, loadingDetails, ready }
+    private enum LoadingState { case initializing, loadingDetails, ready, error }
     @State private var loadingState: LoadingState = .initializing
     var repo: PokemonDataLoader
     var pokemonList: [Pokemon]
-    @State private var pokemon: Pokemon?
+    @State  var pokemon: Pokemon?
+    let defaults = UserDefaults.standard
     
     var body: some View {
         VStack {
-            if (pokemon?.imageUrl != nil && loadingState == .ready) {
+            if let imageUrl = pokemon?.imageUrl  {
                 Text("\(pokemon!.name)")
-                AsyncImage(url: URL(string: pokemon!.imageUrl!)) { image in
-                    image.scaledToFit()
-                } placeholder: {	
+                Spacer()
+                AsyncImage(url: URL(string: imageUrl), scale: 1.5) { image in
+                    image.resizable()
+                } placeholder: {
                     ProgressView().progressViewStyle(.circular)
                 }
-                Button(){
-                    Task {
-                        loadingState = .loadingDetails
-                        await rollRandomPokemon()
-                    }
-                } label: { Image(systemName: "hand.thumbsdown")}
+                .scaledToFit()
+                Spacer()
+                HStack {
+                    Button(){
+                        Task {
+                            loadingState = .loadingDetails
+                            await rollRandomPokemon()	
+                        }
+                    } label: { Image(systemName: "trash").resizable().scaledToFit().frame(width: 50)}
+                    Spacer().frame(width: 40)
+                    Button(
+                        action:{
+                            if let pokemonName = pokemon?.name {
+                                print("storing pokemon \(pokemonName)")
+                                defaults.set(pokemonName, forKey: SELECTED_POKEMON_KEY)
+                            }
+                        },
+                        label: { Image(systemName: "hand.thumbsup").resizable().scaledToFit().frame(width: 50)})
+                }
             } else {
                 Text("Loading...")
+            }
+            if (loadingState == .error) {
+                Text("No pokemon found :(")
             }
         }
         .task {
@@ -39,20 +58,24 @@ struct ParentsView: View {
             print("pokemonDetails for \(pokemon!.name): imageUrl \(pokemon!.imageUrl ?? "")") // TODO: fix et standard image
             loadingState = .ready
         } catch {
-            //TODO: lag noe rundt Loadingstate.error
+            print("Crash during pokemon fetch : \(error)")
+            loadingState = .error
         }
     }
 }
 
 
 
-//#Preview("Has pokemon data") {
-//    @Previewable @Query var pokemonPreviewList : [Pokemon]
-//    let config = ModelConfiguration(isStoredInMemoryOnly: true)
-//    let previewContainer = try! ModelContainer(for: Pokemon.self, configurations: config)
-//    let pokemon = Pokemon(name: "Pikachu")
-//    
-//    previewContainer.mainContext.insert(pokemon)
-//    ParentsView(pokemonList: [Pokemon(name: "orthworm")])
-//        .modelContainer(previewContainer)
-//}
+#Preview("Show pokemon") {
+    //@Previewable @Query var pokemonPreviewList : [Pokemon]
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let previewContainer = try! ModelContainer(for: Pokemon.self, configurations: config)
+
+   // previewContainer.mainContext.insert(pokemon)
+    let repo = NoopDataLoader()
+    ParentsView(repo: repo, pokemonList: [
+        Pokemon(name: "cryogonal"),
+        Pokemon(name: "watchog"),
+        Pokemon(name: "weedle")])
+        .modelContainer(previewContainer)
+}

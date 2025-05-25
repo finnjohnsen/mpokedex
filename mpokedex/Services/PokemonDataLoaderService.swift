@@ -34,7 +34,13 @@ actor PokemonDataLoaderService: PokemonDataLoader {
     
     public func fetchPokemonDetails(pokemon: Pokemon) async throws  -> Pokemon {
         let pokemon = try await service.fetchPokemon(pokemon.name)
-        return Pokemon(name: pokemon.name!, imageUrl: pokemon.sprites!.frontDefault!)
+        
+        return Pokemon(
+            name: pokemon.name!,
+            imageUrl: (pokemon.sprites?.frontDefault ?? "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"))
+        
+        
+        // TODO: finn en bedre failover når vi ikke får bildet
     }
     
     public func loadPokemonIfNeeded() async throws {
@@ -56,10 +62,23 @@ actor PokemonDataLoaderService: PokemonDataLoader {
             for pokemonRef in results {
                 let name = pokemonRef.name!
                 let newPokemon = Pokemon(name: name)
-                //print("Lagrer \(newPokemon)" )
                 modelContext.insert(newPokemon)
             }
             try modelContext.save()
         }
     }
+}
+
+// For Previews
+actor NoopDataLoader: PokemonDataLoader {
+    func fetchPokemonDetails(pokemon: Pokemon) async throws -> Pokemon {
+        return switch pokemon.name {
+            case "weedle": Pokemon(name: "weedle", imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png")
+            case "watchog": Pokemon(name: "watchog", imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/505.png")
+            default: Pokemon(name: "cryogonal", imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/615.png")
+        }
+    }
+    func loadPokemonIfNeeded() async throws {}
+    func wipePokemon() async throws {}
+        
 }

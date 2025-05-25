@@ -1,42 +1,55 @@
 import SwiftUI
 import SwiftData
-
+import Combine
 
 struct MainView: View {
     private enum LoadingState { case initializing, loadingData, ready }
     @Environment(\.modelContext) private var modelContext
     var repo: PokemonDataLoader
-    @Query var pokemonList : [Pokemon]
+    @Query var pokemonList: [Pokemon]
     @State private var loadingState: LoadingState = .initializing
-
+    @AppStorage(SELECTED_POKEMON_KEY) var selectedPokemon: String?
+    
     var body: some View {
         NavigationStack {
-            VStack {
-                if (loadingState != .ready) {
-                    ProgressView()
-                }
-                NavigationStack {
-                    NavigationLink(destination: KidsView()) {
-                        Text("Kid")
+            GeometryReader { gp in
+                VStack {
+                    if (loadingState != .ready) {
+                        ProgressView()
                     }
-                    if (pokemonList.count > 0 && loadingState == .ready) {
-                        NavigationLink(destination: ParentsView(repo: repo, pokemonList: pokemonList)) {
-                            Text("Parents")
+                    NavigationStack {
+                        NavigationLink(destination: KidsView(repo: repo,
+                                                             pokemon: (self.selectedPokemon ?? "")!)) {
+                            Image(systemName:"figure.child")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        }
+                        .frame(height: gp.size.height * 0.8)
+                        .disabled(selectedPokemon == nil)
+                        
+                        if (pokemonList.count > 0 && loadingState == .ready) {
+                            NavigationLink(destination: ParentsView(repo: repo, pokemonList: pokemonList)) {
+                                Image(systemName:"figure.and.child.holdinghands")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                            }.frame(height: gp.size.height * 0.2)
                         }
                     }
                 }
             }
             .toolbarTitleMenu {
                 NavigationLink {
-                    KidsView()
+                    KidsView(repo: repo, pokemon: (self.selectedPokemon ?? "")!)
+                        .disabled(self.selectedPokemon == nil)
                 } label: {
                     Text("Kid")
                 }
                 if pokemonList.count > 0 {
                     NavigationLink {
-                        ParentsView(repo: repo, pokemonList: pokemonList)
+                        ParentsView(repo: repo,
+                                    pokemonList: pokemonList)
                     } label: {
-                        Text("Parent view")
+                        Text("Parent")
                     }
                 }
                 Button("Wipe data") {
@@ -47,7 +60,15 @@ struct MainView: View {
                     initializeState()
                 }.buttonStyle(.borderedProminent)
                 Text("Pokemon loaded \(pokemonList.count)")
+                if let selectedPokemon {
+                    Text("Selected pokemon \(selectedPokemon ?? "none" )")
 
+                } else {
+                    Text("No selected pokemon yet")
+
+                }
+
+                
             }
             .toolbarColorScheme(.light, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
@@ -58,7 +79,6 @@ struct MainView: View {
         }
 
         .task {
-            //repo = PokemonDataLoaderService(modelContext: modelContext)
             initializeState()
         }
     }
@@ -82,16 +102,9 @@ struct MainView: View {
             }
         }
     }
-}
-
-actor NoopDataLoader: PokemonDataLoader {
-    func fetchPokemonDetails(pokemon: Pokemon) async throws -> Pokemon {
-        return Pokemon(name: "Pikachu", imageUrl: "")
-    }
-    
-    func loadPokemonIfNeeded() async throws {}
-    func wipePokemon() async throws {}
+    private func toolbar() {
         
+    }
 }
 
 #Preview("Has pokemon data") {

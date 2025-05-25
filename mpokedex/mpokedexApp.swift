@@ -29,10 +29,10 @@ struct mpokedexApp: App {
         let repo: PokemonDataLoader = PokemonDataLoaderService(modelContext: modelContainer.mainContext)
         WindowGroup {
             MainView(repo:repo)
-          //      .environmentObject(repo)
-            //ParentsView(pokemonList: [Pokemon(name: "orthworm")])
         }
         .modelContainer(modelContainer)
         
     }
 }
+
+let SELECTED_POKEMON_KEY:String = "mpokedex.selectedPokemon"
