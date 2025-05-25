@@ -26,9 +26,8 @@ struct mpokedexApp: App {
     }()
 
     var body: some Scene {
-        let repo: PokemonDataLoader = PokemonDataLoaderService(modelContext: modelContainer.mainContext)
         WindowGroup {
-            MainView(repo:repo)
+            MainView()
         }
         .modelContainer(modelContainer)
         

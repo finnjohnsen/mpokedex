@@ -4,7 +4,7 @@ import PokemonAPI
 typealias PokemonLibAPI = PokemonAPI
 
 // set to 0 to run all:
-let runTestsAbove = 1
+let runTestsAbove = 0
 
 @Suite("PokeLib integration tests")
 struct PokeApiLibServiceTests {
@@ -14,10 +14,10 @@ struct PokeApiLibServiceTests {
     func fetchAbility() async throws {
         let ability = try await api.pokemonService.fetchAbility("drizzle")
         var effectStr:String?
-        if let effectEntries = ability.effectEntries?.filter {e in e.language?.name == "en"} {
+        if let effectEntries = ability.effectEntries?.filter {e in
+            e.language?.name == "en"}{
             effectStr = effectEntries[0].shortEffect!
         }
-        
         #expect(effectStr == "Summons rain that lasts indefinitely upon entering battle.")
     }
     

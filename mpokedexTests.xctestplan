@@ -1,0 +1,29 @@
+{
+  "configurations" : [
+    {
+      "id" : "E4AC869C-B5BC-4B6B-86D8-B0EF91A12E21",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:mpokedex.xcodeproj",
+      "identifier" : "5647664A2DE0636A00DA0118",
+      "name" : "mpokedex"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:mpokedex.xcodeproj",
+        "identifier" : "56DC8CCD2DE267300046BB55",
+        "name" : "Tests"
+      }
+    }
+  ],
+  "version" : 1
+}

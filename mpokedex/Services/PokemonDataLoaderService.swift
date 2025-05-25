@@ -1,3 +1,4 @@
+import SwiftUI
 import Foundation
 import SwiftData
 import PokemonAPI
@@ -10,20 +11,15 @@ import PokemonAPI
 
 // TODO: arv fra ModelActor for å fikse warning (og random kræsj?)
 protocol PokemonDataLoader { // :ModelActor{
-    func loadPokemonIfNeeded() async throws
-    func wipePokemon() async throws
+    func loadPokemonIfNeeded(modelContext: ModelContext) async throws
+    func wipePokemon(modelContext: ModelContext) async throws
     func fetchPokemonDetails(pokemon: Pokemon) async throws  -> Pokemon
 }
 
 actor PokemonDataLoaderService: PokemonDataLoader {
     private let service = PokemonAPI().pokemonService
-    private let modelContext: ModelContext
     
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
-    }
-    
-    private func getPokemonCount() -> Int {
+    private func getPokemonCount(modelContext: ModelContext) -> Int {
         let descriptor = FetchDescriptor<Pokemon>()
         do {
             return try modelContext.fetchCount(descriptor)
@@ -43,18 +39,18 @@ actor PokemonDataLoaderService: PokemonDataLoader {
         // TODO: finn en bedre failover når vi ikke får bildet
     }
     
-    public func loadPokemonIfNeeded() async throws {
-        if getPokemonCount() == 0 {
-            try await fetchAndPersistAllPokemonNames()
+    public func loadPokemonIfNeeded(modelContext: ModelContext) async throws {
+        if getPokemonCount(modelContext: modelContext) == 0 {
+            try await fetchAndPersistAllPokemonNames(modelContext: modelContext)
         }
     }
     
-    public func wipePokemon() async throws {
+    public func wipePokemon(modelContext: ModelContext) async throws {
         try modelContext.delete(model: Pokemon.self)
         try modelContext.save()
     }
     
-    private func fetchAndPersistAllPokemonNames() async throws {
+    private func fetchAndPersistAllPokemonNames(modelContext: ModelContext) async throws {
         let pagedPokemon = try await service.fetchPokemonList(paginationState: .initial(pageLimit: 2000))
         print("Fetched \(pagedPokemon.count!) pokemon from API")
         let nextPage = try await service.fetchPokemonList(paginationState: .continuing(pagedPokemon, .next))
@@ -71,6 +67,10 @@ actor PokemonDataLoaderService: PokemonDataLoader {
 
 // For Previews
 actor NoopDataLoader: PokemonDataLoader {
+    func loadPokemonIfNeeded(modelContext: ModelContext) async throws {}
+    
+    func wipePokemon(modelContext: ModelContext) async throws {}
+    
     func fetchPokemonDetails(pokemon: Pokemon) async throws -> Pokemon {
         return switch pokemon.name {
             case "weedle": Pokemon(name: "weedle", imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/13.png")
@@ -78,7 +78,5 @@ actor NoopDataLoader: PokemonDataLoader {
             default: Pokemon(name: "cryogonal", imageUrl: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/615.png")
         }
     }
-    func loadPokemonIfNeeded() async throws {}
-    func wipePokemon() async throws {}
         
 }

@@ -5,7 +5,7 @@ import Combine
 struct MainView: View {
     private enum LoadingState { case initializing, loadingData, ready }
     @Environment(\.modelContext) private var modelContext
-    var repo: PokemonDataLoader
+    @State private var repo: PokemonDataLoader?
     @Query var pokemonList: [Pokemon]
     @State private var loadingState: LoadingState = .initializing
     @AppStorage(SELECTED_POKEMON_KEY) var selectedPokemon: String?
@@ -18,7 +18,7 @@ struct MainView: View {
                         ProgressView()
                     }
                     NavigationStack {
-                        NavigationLink(destination: KidsView(repo: repo,
+                        NavigationLink(destination: KidsView(repo: repo ?? NoopDataLoader(),
                                                              pokemon: (self.selectedPokemon ?? "")!)) {
                             Image(systemName:"figure.child")
                                 .resizable()
@@ -28,7 +28,7 @@ struct MainView: View {
                         .disabled(selectedPokemon == nil)
                         
                         if (pokemonList.count > 0 && loadingState == .ready) {
-                            NavigationLink(destination: ParentsView(repo: repo, pokemonList: pokemonList)) {
+                            NavigationLink(destination: ParentsView(repo: repo ?? NoopDataLoader(), pokemonList: pokemonList)) {
                                 Image(systemName:"figure.and.child.holdinghands")
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
@@ -38,22 +38,11 @@ struct MainView: View {
                 }
             }
             .toolbarTitleMenu {
-                NavigationLink {
-                    KidsView(repo: repo, pokemon: (self.selectedPokemon ?? "")!)
-                        .disabled(self.selectedPokemon == nil)
-                } label: {
-                    Text("Kid")
-                }
-                if pokemonList.count > 0 {
-                    NavigationLink {
-                        ParentsView(repo: repo,
-                                    pokemonList: pokemonList)
-                    } label: {
-                        Text("Parent")
-                    }
-                }
                 Button("Wipe data") {
                     wipePokemon()
+                }.buttonStyle(.borderedProminent)
+                Button("Wipe selected") {
+                    selectedPokemon = nil
                 }.buttonStyle(.borderedProminent)
                 
                 Button("Fetch data") {
@@ -67,8 +56,6 @@ struct MainView: View {
                     Text("No selected pokemon yet")
 
                 }
-
-                
             }
             .toolbarColorScheme(.light, for: .navigationBar)
             .navigationBarTitleDisplayMode(.inline)
@@ -79,14 +66,16 @@ struct MainView: View {
         }
 
         .task {
+            repo = PokemonDataLoaderService()
             initializeState()
         }
     }
     private func initializeState()  {
         Task {
             do {
+                guard let repo = repo else { return }
                 loadingState = .loadingData
-                try await repo.loadPokemonIfNeeded()
+                try await repo.loadPokemonIfNeeded(modelContext: modelContext)
                 loadingState = .ready
             } catch {
             }
@@ -95,7 +84,8 @@ struct MainView: View {
     private func wipePokemon() {
         Task {
             do {
-                try await repo.wipePokemon()
+                guard let repo = repo else { return }
+                try await repo.wipePokemon(modelContext: modelContext)
                 loadingState = .initializing
             } catch {
                 
@@ -114,6 +104,6 @@ struct MainView: View {
     let pokemon = Pokemon(name: "Pikachu")
     
     previewContainer.mainContext.insert(pokemon)
-    return MainView(repo: NoopDataLoader())
+    return MainView()
         .modelContainer(previewContainer)
 }
