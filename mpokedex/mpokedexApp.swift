@@ -25,7 +25,7 @@ struct mpokedexApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RandomPokemonView()
+            MainView()
         }
         .modelContainer(sharedModelContainer)
     }

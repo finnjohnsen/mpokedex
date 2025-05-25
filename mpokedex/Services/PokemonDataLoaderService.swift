@@ -3,7 +3,7 @@ import SwiftData
 import PokemonAPI
 
 /*
- Har to ansvar :/	
+ Har to ansvar :/
  
  Kunne funnet en måte å splitte i API-loading fra SwiftData-greier.
  */
@@ -46,13 +46,13 @@ actor PokemonDataLoaderService {
     
     private func fetchAndPersistAllPokemonNames() async throws {
         let pagedPokemon = try await service.fetchPokemonList(paginationState: .initial(pageLimit: 2000))
-        print(" Total \(pagedPokemon.count!)")
+        print("Fetched \(pagedPokemon.count!) pokemon from API")
         let nextPage = try await service.fetchPokemonList(paginationState: .continuing(pagedPokemon, .next))
         if let results = nextPage.results {
             for pokemonRef in results {
                 let name = pokemonRef.name!
                 let newPokemon = Pokemon(name: name)
-                print("Lagrer \(newPokemon)" )
+                //print("Lagrer \(newPokemon)" )
                 modelContext.insert(newPokemon)
             }
             try modelContext.save()
