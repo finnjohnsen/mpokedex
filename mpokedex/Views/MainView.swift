@@ -1,16 +1,13 @@
 import SwiftUI
 import SwiftData
 
-enum LoadingState { case initializing, loadingData, ready }
-
 
 struct MainView: View {
+    private enum LoadingState { case initializing, loadingData, ready }
     @Environment(\.modelContext) private var modelContext
-    @Query private var pokemonList : [Pokemon]
-
-    @State private var repo: PokemonDataLoaderService?
+    var repo: PokemonDataLoader
+    @Query var pokemonList : [Pokemon]
     @State private var loadingState: LoadingState = .initializing
-    @State private var randomInt: Int?
 
     var body: some View {
         NavigationStack {
@@ -22,8 +19,10 @@ struct MainView: View {
                     NavigationLink(destination: KidsView()) {
                         Text("Kid")
                     }
-                    NavigationLink(destination: ParentsView()) {
-                        Text("Parents")
+                    if (pokemonList.count > 0 && loadingState == .ready) {
+                        NavigationLink(destination: ParentsView(repo: repo, pokemonList: pokemonList)) {
+                            Text("Parents")
+                        }
                     }
                 }
             }
@@ -33,12 +32,13 @@ struct MainView: View {
                 } label: {
                     Text("Kid")
                 }
-                NavigationLink {
-                    ParentsView()
-                } label: {
-                    Text("Parent view")
+                if pokemonList.count > 0 {
+                    NavigationLink {
+                        ParentsView(repo: repo, pokemonList: pokemonList)
+                    } label: {
+                        Text("Parent view")
+                    }
                 }
-                
                 Button("Wipe data") {
                     wipePokemon()
                 }.buttonStyle(.borderedProminent)
@@ -56,20 +56,17 @@ struct MainView: View {
             
             .padding()
         }
+
         .task {
-            repo = PokemonDataLoaderService(modelContext: modelContext)
+            //repo = PokemonDataLoaderService(modelContext: modelContext)
             initializeState()
         }
     }
     private func initializeState()  {
         Task {
             do {
-                guard let repo = repo else { return }
                 loadingState = .loadingData
                 try await repo.loadPokemonIfNeeded()
-                if pokemonList.count > 0 {
-                    randomInt = Int.random(in: 0..<pokemonList.count)
-                }
                 loadingState = .ready
             } catch {
             }
@@ -78,7 +75,6 @@ struct MainView: View {
     private func wipePokemon() {
         Task {
             do {
-                guard let repo = repo else { return }
                 try await repo.wipePokemon()
                 loadingState = .initializing
             } catch {
@@ -88,6 +84,23 @@ struct MainView: View {
     }
 }
 
-#Preview {
-    MainView()
+actor NoopDataLoader: PokemonDataLoader {
+    func fetchPokemonDetails(pokemon: Pokemon) async throws -> Pokemon {
+        return Pokemon(name: "Pikachu", imageUrl: "")
+    }
+    
+    func loadPokemonIfNeeded() async throws {}
+    func wipePokemon() async throws {}
+        
+}
+
+#Preview("Has pokemon data") {
+    @Previewable @Query var pokemonPreviewList : [Pokemon]
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let previewContainer = try! ModelContainer(for: Pokemon.self, configurations: config)
+    let pokemon = Pokemon(name: "Pikachu")
+    
+    previewContainer.mainContext.insert(pokemon)
+    return MainView(repo: NoopDataLoader())
+        .modelContainer(previewContainer)
 }

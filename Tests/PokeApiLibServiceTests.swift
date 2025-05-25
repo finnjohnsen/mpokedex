@@ -11,8 +11,8 @@ struct PokeApiLibServiceTests {
     @Test("Fetching a Pokemon works")
     func fetchPokemon() async throws {
         do {
-            let pokemon = try await api.pokemonService.fetchPokemon(1)
-            print("NAME \(pokemon.name!)")
+            let pokemon = try await api.pokemonService.fetchPokemon("bulbasaur")
+            print("POKEMON \(pokemon.sprites?.frontDefault)")
             try #require(pokemon.name! == "bulbasaur")
             
 

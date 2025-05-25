@@ -7,7 +7,15 @@ import PokemonAPI
  
  Kunne funnet en måte å splitte i API-loading fra SwiftData-greier.
  */
-actor PokemonDataLoaderService {
+
+// TODO: arv fra ModelActor for å fikse warning (og random kræsj?)
+protocol PokemonDataLoader { // :ModelActor{
+    func loadPokemonIfNeeded() async throws
+    func wipePokemon() async throws
+    func fetchPokemonDetails(pokemon: Pokemon) async throws  -> Pokemon
+}
+
+actor PokemonDataLoaderService: PokemonDataLoader {
     private let service = PokemonAPI().pokemonService
     private let modelContext: ModelContext
     
@@ -15,7 +23,7 @@ actor PokemonDataLoaderService {
         self.modelContext = modelContext
     }
     
-    func getPokemonCount() -> Int {
+    private func getPokemonCount() -> Int {
         let descriptor = FetchDescriptor<Pokemon>()
         do {
             return try modelContext.fetchCount(descriptor)
@@ -24,22 +32,18 @@ actor PokemonDataLoaderService {
         }
     }
     
-    func getAllPokemon() -> [Pokemon] {
-        let descriptor = FetchDescriptor<Pokemon>()
-        do {
-            return try modelContext.fetch(descriptor)
-        } catch {
-            return []
-        }
+    public func fetchPokemonDetails(pokemon: Pokemon) async throws  -> Pokemon {
+        let pokemon = try await service.fetchPokemon(pokemon.name)
+        return Pokemon(name: pokemon.name!, imageUrl: pokemon.sprites!.frontDefault!)
     }
     
-    func loadPokemonIfNeeded() async throws {
+    public func loadPokemonIfNeeded() async throws {
         if getPokemonCount() == 0 {
             try await fetchAndPersistAllPokemonNames()
         }
     }
     
-    func wipePokemon() throws {
+    public func wipePokemon() async throws {
         try modelContext.delete(model: Pokemon.self)
         try modelContext.save()
     }
