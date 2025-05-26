@@ -2,6 +2,11 @@ import SwiftUI
 import SwiftData
 import Combine
 
+/*
+ HovedView-et har litt mye å gjøre, men målet er å deligere over til kids/KidsView.swift eller parents/ParentsView.swift
+ 
+ */
+
 struct MainView: View {
     private enum LoadingState { case initializing, loadingData, ready }
     @Environment(\.modelContext) private var modelContext
@@ -19,10 +24,11 @@ struct MainView: View {
                     }
                     NavigationStack {
                         NavigationLink(destination: KidsView(repo: repo ?? NoopDataLoader(),
-                                                             pokemon: (self.selectedPokemon ?? "")!)) {
-                            Image(systemName:"figure.child")
+                                                             pokemon: Pokemon(name: (self.selectedPokemon ?? "")!))) {
+                            Image("PokemonImage")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
+                                .opacity(selectedPokemon==nil ? 0.2 : 1.0)
                         }
                         .frame(height: gp.size.height * 0.8)
                         .disabled(selectedPokemon == nil)
@@ -38,9 +44,10 @@ struct MainView: View {
                 }
             }
             .toolbarTitleMenu {
-                Button("Wipe data") {
-                    wipePokemon()
-                }.buttonStyle(.borderedProminent)
+                //TODO: bugged, because of the mishandling of modelContext 
+//                Button("Wipe data") {
+//                    wipePokemon()
+//                }.buttonStyle(.borderedProminent)
                 Button("Wipe selected") {
                     selectedPokemon = nil
                 }.buttonStyle(.borderedProminent)
@@ -50,7 +57,7 @@ struct MainView: View {
                 }.buttonStyle(.borderedProminent)
                 Text("Pokemon loaded \(pokemonList.count)")
                 if let selectedPokemon {
-                    Text("Selected pokemon \(selectedPokemon ?? "none" )")
+                    Text("Selected pokemon \(selectedPokemon)")
 
                 } else {
                     Text("No selected pokemon yet")
@@ -97,12 +104,23 @@ struct MainView: View {
     }
 }
 
-#Preview("Has pokemon data") {
+#Preview("Standard") {
     @Previewable @Query var pokemonPreviewList : [Pokemon]
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let previewContainer = try! ModelContainer(for: Pokemon.self, configurations: config)
     let pokemon = Pokemon(name: "Pikachu")
     
+    previewContainer.mainContext.insert(pokemon)
+    return MainView()
+        .modelContainer(previewContainer)
+}
+
+#Preview("Parent has Selected") {
+    @Previewable @Query var pokemonPreviewList : [Pokemon]
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    let previewContainer = try! ModelContainer(for: Pokemon.self, configurations: config)
+    let pokemon = Pokemon(name: "Pikachu")
+    UserDefaults.standard.set("Pikachu", forKey: SELECTED_POKEMON_KEY)
     previewContainer.mainContext.insert(pokemon)
     return MainView()
         .modelContainer(previewContainer)

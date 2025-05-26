@@ -1,11 +1,42 @@
 # iOS Swift assignment mini-Pokédex
 
-...
+# Organisering
+
+- mpokedexApp.swift gjør så lite som mulig og delegerer over til MainView.
+- MainView.swift peker videre på kids/KidsView og parents/ParentsView. J
+- model/ er for eget domeneobjekt. 
+
+Se kommentarer i toppen på swift-filene
+
+## Features
+- Voksen kan velge pokemon, eller trykke random.
+- Valgt pokemon lagres i UserDefaults
+- Barneview har et card for å se valgt pokemon
+
+## PokemonAPI lib
+Pokeapi.co sitt API er høyt denormalisert. Dataene om pokemons peker ofte videre til ressurser i stedet for å ha de på stedet, så det var mye tid å spare på å gå for PokemonApi libbet. GraphQL har jeg ikke nok erfaring med til å ta inn i en oppgave som denne.
+
+## Bra
+#preview nesten alltid fungert i alle view-ene. Jeg synes dette er noe av det viktigste å holde oppe for god produktivitet i UI-flikk.
+
+AsyncImage er noe uberegnelig i #preview, og bør nok byttes ut med noe offline for previews.
+
+## Problemer
+Swift Testing har jeg ikke fått opp og gå som jeg ønsket. Det er noe i XCode 16.4 som gjør at jeg ikke får opp test-diamantene i gutter for å kunne kjøre indivduelle tester. Men CTRL-U fungerer og jeg fant et triks (.endabled -kriterie) for å kjøre kun én og én test.
+
+MainView.swift er litt feit.
+
+kids/PokemonCard er stygg :'(
+
+## Bugs
+modelContext skal ikke sendes til PokemonDataLoader, en får warnings på dette.
 
 
+## Random greier
+- Har AppIkon
+- Har definert en farge og et bilde i Assets.
 
-
-# Assignment
+# Assignment COPY & PASTE FRA MAIL
 
 ## Build a mini Pokédex
 

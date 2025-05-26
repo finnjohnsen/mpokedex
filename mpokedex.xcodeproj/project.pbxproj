@@ -24,7 +24,6 @@
 /* Begin PBXFileReference section */
 		563E096B2DE1E14B00F5A2C7 /* Testing.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Testing.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/Testing.framework; sourceTree = DEVELOPER_DIR; };
 		5647664B2DE0636A00DA0118 /* mpokedex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mpokedex.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		569EBAF02DE3C79A003845EE /* mpokedexTests.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = mpokedexTests.xctestplan; sourceTree = "<group>"; };
 		56DC8CCE2DE267300046BB55 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -72,7 +71,6 @@
 		564766422DE0636A00DA0118 = {
 			isa = PBXGroup;
 			children = (
-				569EBAF02DE3C79A003845EE /* mpokedexTests.xctestplan */,
 				5647664D2DE0636A00DA0118 /* mpokedex */,
 				56DC8CCF2DE267300046BB55 /* Tests */,
 				563E09492DE1D46800F5A2C7 /* Frameworks */,

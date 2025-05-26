@@ -4,9 +4,9 @@ import SwiftData
 import PokemonAPI
 
 /*
- Har to ansvar :/
+ Denne har to ansvar: å hente fra API-et, og alt rundt SwiftData persistens. Det er for mye.
  
- Kunne funnet en måte å splitte i API-loading fra SwiftData-greier.
+ I fremtiden til denne blir kun API-et så håndteres SwiftData-crud et annet sted.
  */
 
 // TODO: arv fra ModelActor for å fikse warning (og random kræsj?)
