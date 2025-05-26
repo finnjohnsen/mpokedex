@@ -9,9 +9,22 @@
 Se kommentarer i toppen på swift-filene
 
 ## Features
+- Startskjerm, voksen må først velge en Pokemon før barn kan trykke på Pokeball.
+
+![velger](./doc/1.png)
+
 - Voksen kan velge pokemon, eller trykke random.
+
+![voksen](./doc/2.png)
+
 - Valgt pokemon lagres i UserDefaults
 - Barneview har et card for å se valgt pokemon
+
+![barn](./doc/3.png)
+
+- Pokemon-lista hentes og lagres i lokal database. Navneliste pr nå, men er laget for å utvides slik at en kan ta vare på mere data om pokemons. 
+-- Enten up-front lasting. Dyr oppstart.
+-- eller lagre hver gang en henter en pokemon vi ikke har sett før. Billigere oppstart, men laggy bilder som må hentes asynkront.
 
 ## PokemonAPI lib
 Pokeapi.co sitt API er høyt denormalisert. Dataene om pokemons peker ofte videre til ressurser i stedet for å ha de på stedet, så det var mye tid å spare på å gå for PokemonApi libbet. GraphQL har jeg ikke nok erfaring med til å ta inn i en oppgave som denne.
